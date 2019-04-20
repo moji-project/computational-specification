@@ -1,0 +1,253 @@
+type Query {
+  serviceInfo: ServiceInfo!
+  i18n(language: ID!): I18N
+
+  self: Self!
+  challenger(id: ID!): Challenger
+  challengers(page: Int!, offset: Int!): [Challenger!]!
+
+  problem(id: ID!): Problem
+  problems(
+    page: Int = 0
+    offset: Int = 20
+    option: ProblemOptionInput
+  ): Problems
+
+  ranking(challengerId: ID!, rankingOption: RankingOptionInput): Ranking
+  rankings(
+    page: Int = 0
+    offset: Int = 20
+    rankingOption: RankingOptionInput
+  ): Rankings
+}
+
+type Mutation {
+  refreshToken(authToken: String!): String
+
+  modifyNameOfSelf(name: String!): Boolean
+  modifyProfileTextOfSelf(text: String!): Boolean
+  addAnswerToProblem(problemId: ID!, answer: ChallengerAnswer!): Answer!
+
+  changeLanguage(languageId: String!): Boolean
+}
+
+input ProblemOptionInput {
+  kind: ID
+  sortBy: ID
+  filterBy: ID
+}
+
+input RankingOptionInput {
+  kind: ID
+  sortBy: ID
+  filterBy: ID
+}
+
+input ChallengerAnswer {
+  language: ID!
+  source: String!
+}
+
+interface Node {
+  id: ID!
+  createdAt: String!
+}
+
+interface PageInfo {
+  hasPrevious: Boolean!
+  hasNext: Boolean!
+}
+
+interface User {
+  id: String!
+  name: String!
+  role: String!
+}
+
+interface Option {
+  id: String!
+  name: String!
+  description: String!
+}
+
+type ServiceInfo {
+  # 서비스 이름
+  appName: String!
+  # 서비스 설명
+  description: String
+  # 캐치프레이즈
+  catchPhrase: String
+  # 지원하는 언어 컬렉션
+  languages: [ProgrammingLanguage!]!
+  # 지원하는 MOJI 버전
+  version: String!
+  # 지원하는 MOJI 레벨
+  level: Int!
+}
+
+type ProgrammingLanguage implements Node {
+  # 식별자
+  id: ID!
+  # 언어 이름
+  # ex) C++
+  name: String!
+  # ISO 8601
+  createdAt: String!
+  # 언어의 버전
+  # ex) C++: 17
+  version: String!
+  # 언어 런타임 정보
+  # ex) C++: gcc (x86_64-posix-seh, Built by strawberryperl.com project) 7.1.0
+  runtime: String!
+  command: Command!
+  # 최대 허용 시간
+  maxTime: Int!
+  # 최대 허용 메모리
+  maxMemory: Int!
+  # 지원하는 라이브러리 컬렉션
+  libraries: [Library]!
+}
+
+type Command {
+  # 컴파일시 사용하는 커맨드
+  compile: String
+  # 실행시 사용하는 커맨드
+  execute: String!
+}
+
+type Library {
+  # 라이브러리 이름
+  name: String!
+  # 라이브러리 버전
+  version: String!
+}
+
+type I18N {
+  userRoles: [UserRole!]!
+  rankingOptions: [RankingOption!]!
+}
+
+type UserRole implements Option {
+  id: String!
+  name: String!
+  description: String!
+}
+
+type RankingOption {
+  id: String!
+  name: String!
+  description: String!
+  sortBy: [SortBy!]!
+  filterBy: [FilterBy!]!
+}
+
+type SortBy implements Option {
+  id: String!
+  name: String!
+  description: String!
+}
+
+type FilterBy implements Option {
+  id: String!
+  name: String!
+  description: String!
+}
+
+type Self implements User {
+  id: String!
+  name: String!
+  role: String!
+}
+
+type Challenger implements User {
+  id: String!
+  name: String!
+  role: String!
+}
+
+type Problem implements Node {
+  id: String
+  title: String
+  tags: [String!]!
+  languages: [ProgrammingLanguage!]!
+  explains: [Explain!]!
+  samples: [Sample!]!
+  createdAt: String!
+}
+
+type Problems {
+  pageInfo: ProblemPageInfo!
+  problems: [Problem!]!
+}
+
+type ProblemPageInfo implements PageInfo {
+  hasPrevious: Boolean!
+  hasNext: Boolean!
+}
+
+type Explain {
+  # ISO 639-1
+  language: String!
+  mimeType: String
+  text: String
+}
+
+type Sample {
+  input: String!
+  output: String!
+}
+
+type Answer {
+  source: String!
+  # ISO 639-1
+  language: String!
+  state: AnswerState!
+  info: AnswerInfo
+}
+
+enum AnswerState {
+  Submitted
+  Initialized
+  Judging
+  Completed
+}
+
+type AnswerInfo {
+  result: ResultResult!
+  usedMemories: Int!
+  usedTimes: Int!
+}
+
+enum ResultResult {
+  CorrectAnswer
+  WrongAnswer
+  CompilationError
+  RuntimeError
+  TimeLimitExceeded
+  FormatError
+}
+
+type Statistics {
+  problemCount: Int!
+  answersCount: Int!
+}
+
+type Ranking {
+  challenger: Challenger!
+}
+
+type Rankings {
+  pageInfo: RankingPageInfo
+  challengers: [Challenger!]!
+}
+
+type RankingPageInfo implements PageInfo {
+  hasPrevious: Boolean!
+  hasNext: Boolean!
+}
+
+type RankingKind implements Option {
+  id: String!
+  name: String!
+  description: String!
+}
