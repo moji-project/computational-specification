@@ -181,7 +181,7 @@ type Challenger implements User {
 }
 
 type Problem implements Node {
-  id: String
+  id: ID!
   title: String
   tags: [String!]!
   languages: [ProgrammingLanguage!]!
@@ -210,7 +210,7 @@ type Explain {
 }
 
 """
-I/O that guarantee the same input / output when scored as a correct answer to a particular problem.
+I/O that guarantee the same input/output when scored as a correct answer to a particular problem.
 """
 type Sample {
   input: String!
