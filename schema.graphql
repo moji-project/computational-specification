@@ -71,54 +71,66 @@ interface Option {
 }
 
 type ServiceInfo {
-  # 서비스 이름
+  """
+  application name
+  """
   appName: String!
-  # 서비스 설명
   description: String
-  # 캐치프레이즈
   catchPhrase: String
-  # 지원하는 언어 컬렉션
+  """
+  support languages
+  """
   languages: [ProgrammingLanguage!]!
-  # 지원하는 MOJI 버전
+  """
+  support OJIC version
+  """
   version: String!
-  # 지원하는 MOJI 레벨
+  """
+  support OJIC level
+  """
   level: Int!
 }
 
 type ProgrammingLanguage implements Node {
-  # 식별자
   id: ID!
-  # 언어 이름
-  # ex) C++
+  """
+  ex) C++
+  """
   name: String!
-  # ISO 8601
-  createdAt: String!
-  # 언어의 버전
-  # ex) C++: 17
+  """
+  ex) C++: 17
+  """
   version: String!
-  # 언어 런타임 정보
-  # ex) C++: gcc (x86_64-posix-seh, Built by strawberryperl.com project) 7.1.0
+  """
+  ex) C++: gcc (x86_64-posix-seh, Built by strawberryperl.com project) 7.1.0
+  """
   runtime: String!
   command: Command!
-  # 최대 허용 시간
   maxTime: Int!
-  # 최대 허용 메모리
   maxMemory: Int!
-  # 지원하는 라이브러리 컬렉션
+  """
+  support libraries with language
+  """
   libraries: [Library]!
+  """
+  ISO 8601
+  """
+  createdAt: String!
 }
 
 type Command {
-  # 컴파일시 사용하는 커맨드
+  """
+  command in compile time
+  """
   compile: String
-  # 실행시 사용하는 커맨드
+  """
+  command in execution time
+  """
   execute: String!
 }
 
 type Library {
-  # 라이브러리 이름
   name: String!
-  # 라이브러리 버전
   version: String!
 }
 
@@ -159,6 +171,9 @@ type Self implements User {
   role: String!
 }
 
+"""
+a user who can submit an answer to a problem.
+"""
 type Challenger implements User {
   id: String!
   name: String!
@@ -186,12 +201,17 @@ type ProblemPageInfo implements PageInfo {
 }
 
 type Explain {
-  # ISO 639-1
+  """
+  ISO 639-1
+  """
   language: String!
   mimeType: String
   text: String
 }
 
+"""
+I/O that guarantee the same input / output when scored as a correct answer to a particular problem.
+"""
 type Sample {
   input: String!
   output: String!
@@ -199,7 +219,9 @@ type Sample {
 
 type Answer {
   source: String!
-  # ISO 639-1
+  """
+  ISO 639-1
+  """
   language: String!
   state: AnswerState!
   info: AnswerInfo
@@ -237,7 +259,7 @@ type Ranking {
 }
 
 type Rankings {
-  pageInfo: RankingPageInfo
+  pageInfo: RankingPageInfo!
   challengers: [Challenger!]!
 }
 
