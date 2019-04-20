@@ -94,15 +94,15 @@ type ServiceInfo {
 type ProgrammingLanguage implements Node {
   id: ID!
   """
-  ex) C++
+  e.g. C++
   """
   name: String!
   """
-  ex) C++: 17
+  e.g. C++: 17
   """
   version: String!
   """
-  ex) C++: gcc (x86_64-posix-seh, Built by strawberryperl.com project) 7.1.0
+  e.g. C++: gcc (x86_64-posix-seh, Built by strawberryperl.com project) 7.1.0
   """
   runtime: String!
   command: Command!
