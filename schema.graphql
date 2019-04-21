@@ -1,7 +1,16 @@
-type Query {
-  serviceInfo: ServiceInfo!
-  i18n(language: ID!): I18N
+"""
+The DateTime scalar type represents textual data, represented as ISO-8601 format.
+"""
+scalar DateTime
 
+type Query {
+  """
+  Details about the application.
+  """
+  appInfo: AppInfo!
+  """
+  Details about self.
+  """
   self: Self!
   challenger(id: ID!): Challenger
   challengers(page: Int!, offset: Int!): [Challenger!]!
@@ -50,7 +59,7 @@ input ChallengerAnswer {
 
 interface Node {
   id: ID!
-  createdAt: String!
+  createdAt: DateTime!
 }
 
 interface PageInfo {
@@ -59,9 +68,15 @@ interface PageInfo {
 }
 
 interface User {
-  id: String!
+  id: ID!
   name: String!
-  role: String!
+  role: Role!
+  createdAt: DateTime!
+}
+
+interface Identifiable {
+  name: String!
+  url: String!
 }
 
 interface Option {
@@ -70,76 +85,134 @@ interface Option {
   description: String!
 }
 
-type ServiceInfo {
+"""
+Application information that the client can pre-cache to improve performance.
+"""
+type AppInfo {
   """
-  application name
-  """
-  appName: String!
-  description: String
-  catchPhrase: String
-  """
-  support languages
-  """
-  languages: [ProgrammingLanguage!]!
-  """
-  support OJIC version
-  """
-  version: String!
-  """
-  support OJIC level
-  """
-  level: Int!
-}
-
-type ProgrammingLanguage implements Node {
-  id: ID!
-  """
-  e.g. C++
+  The name of the application.
   """
   name: String!
   """
-  e.g. C++: 17
+  A description of the application.
+  """
+  description: String
+  """
+  A catchphrase of the application.
+  """
+  catchPhrase: String
+  """
+  Current OJIC supported version of the application.
   """
   version: String!
   """
-  e.g. C++: gcc (x86_64-posix-seh, Built by strawberryperl.com project) 7.1.0
+  Current OJIC supported level of the application.
+  """
+  level: Int!
+  """
+  Languages that supports the judging of the source code of the answers in the application.
+  """
+  languages(id: ID! = null): [Language!]!
+  """
+  Programming languages that supports the judging of the source code of the answers in the application.
+  """
+  programmingLanguages: [ProgrammingLanguage!]!
+  """
+  A collection of roles for the application.
+  """
+  roles: [Role!]!
+  """
+
+  """
+  rankingOptions: [RankingOption!]!
+}
+
+"""
+The language people-to-people use to communicate, such as Korean, English, and Japanese.
+"""
+type Language implements Node {
+  """
+  The identifier, represented as ISO-639-1 format.
+  """
+  id: ID!
+  """
+  The string, represented as ISO language name.
+  """
+  name: String!
+  """
+  The time when the application started supporting the language.
+  """
+  createdAt: DateTime!
+}
+
+"""
+A programming language that can be used to solve problems.
+"""
+type ProgrammingLanguage implements Node {
+  """
+  An identifier used to identify the language.
+  """
+  id: ID!
+  """
+  A name that refers to the programming language, such a C++.
+  """
+  name: String!
+  """
+  A more detailed name for the programming language, such a C++17.
+  """
+  detailName: String!
+  """
+  The runtime of the programming language used by the application to judge the source code of the answers, such a gcc (x86_64-posix-seh, Built by strawberryperl.com project) 7.1.0.
   """
   runtime: String!
-  command: Command!
+  """
+  Commands used to judge answer source code.
+  """
+  commands: Commands!
+  """
+  The time from the answer source code execution to the forced termination.
+  """
   maxTime: Int!
+  """
+  Total memory available after source code execution.
+  """
   maxMemory: Int!
   """
-  support libraries with language
+  libraries that can be used when solving problems in this language.
   """
   libraries: [Library]!
   """
-  ISO 8601
+  The time when the application started supporting the language.
   """
-  createdAt: String!
+  createdAt: DateTime!
 }
 
-type Command {
+"""
+The commands used to compile or execute the source code.
+"""
+type Commands {
   """
-  command in compile time
+  command in compile time.
   """
   compile: String
   """
-  command in execution time
+  command in execution time.
   """
   execute: String!
 }
 
+"""
+Additional libraries available in the programming language environment.
+"""
 type Library {
   name: String!
   version: String!
 }
 
-type I18N {
-  userRoles: [UserRole!]!
-  rankingOptions: [RankingOption!]!
-}
-
-type UserRole implements Option {
+"""
+Role such as administrator, organizer.
+"""
+type Role implements Option {
   id: String!
   name: String!
   description: String!
@@ -165,29 +238,60 @@ type FilterBy implements Option {
   description: String!
 }
 
+"""
+
+"""
 type Self implements User {
-  id: String!
+  id: ID!
   name: String!
-  role: String!
+  role: Role!
+  createdAt: DateTime!
 }
 
 """
 a user who can submit an answer to a problem.
 """
 type Challenger implements User {
-  id: String!
+  id: ID!
   name: String!
-  role: String!
+  role: Role!
+  createdAt: DateTime!
 }
 
 type Problem implements Node {
   id: ID!
   title: String
+  wirter: ProblemWriter
+  creator: [ProblemCreator!]!
+  translator: [ProblemTranslator!]!
+  contributor: [ProblemContributor!]!
   tags: [String!]!
-  languages: [ProgrammingLanguage!]!
-  explains: [Explain!]!
+  programmingLanguages: [ProgrammingLanguage!]!
+  explains(languages: [ID!] = null): [Explain!]!
   samples: [Sample!]!
-  createdAt: String!
+  createdAt: DateTime!
+}
+
+type ProblemWriter implements User {
+  id: ID!
+  name: String!
+  role: Role!
+  createdAt: DateTime!
+}
+
+type ProblemCreator implements Identifiable {
+  name: String!
+  url: String!
+}
+
+type ProblemTranslator implements Identifiable {
+  name: String!
+  url: String!
+}
+
+type ProblemContributor implements Identifiable {
+  name: String!
+  url: String!
 }
 
 type Problems {
@@ -204,7 +308,7 @@ type Explain {
   """
   ISO 639-1
   """
-  language: String!
+  languages: [Language!]!
   mimeType: String
   text: String
 }
